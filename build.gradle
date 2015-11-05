@@ -1,0 +1,56 @@
+// Apply the java plugin to add support for Java
+apply plugin: 'java'
+apply plugin: 'jacoco'
+
+repositories {
+	maven {
+		url 'http://repo1.maven.org/maven2'	// mavenCentral()
+	}	
+}
+
+project.ext.iwcjff = 'I Will Code JVM For Foods' 
+
+ext.afsj = 'Ajik File Splitter && Joiner'
+
+// test configuration
+test {
+	// makes the standard streams (err and out) visible at console when running tests
+	testLogging.showStandardStreams = true
+	
+	finalizedBy {
+		// See code-everage at $buildDir/reports/jacoco/
+		jacocoTestReport
+	}
+}
+
+// task configuration
+// get code-everage by run task test or jacocoTest
+task jacocoTest(dependsOn: test) {
+	doLast {
+		jacocoTestReport
+	}
+}
+
+jar {
+	manifest {
+		attributes 'Main-Class': 'khang.iwcjff.afsj.Afsj'
+	}
+}
+
+dependencies {
+	testCompile (group: 'junit', name: 'junit', version: '4.12')
+}
+
+// task configuration
+task makeRelease(dependsOn: build, type: Copy) {
+
+	finalizedBy clean
+		
+	// copy jar executable into bin
+	from "$buildDir/libs"
+	into "bin"
+	include "**/*.jar"		
+	
+	// logging
+	println "clean $buildDir directories and copy jar from $buildDir/libs/${rootProject.name}.jar"
+}
